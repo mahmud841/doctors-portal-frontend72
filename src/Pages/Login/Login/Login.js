@@ -7,25 +7,34 @@ import login from '../../../images/login.png';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({});
-const {user, loginUser, isLoading, authError} = useAuth();
+const {user, loginUser,signInWithGoogle, isLoading, authError} = useAuth();
 
 const location = useLocation();
 const history = useHistory();
 
 
 
-  const handleOnChange = e => {
+  // const handleonBlur = e => {
+  const handleOnBlur = e => {
     const field = e.target.name;
     const value = e.target.value;
     console.log(field, value);
     const newLoginData = { ...loginData };
     newLoginData[field] = value;
+    console.log(newLoginData);
+    
     setLoginData(newLoginData);
   }
   const handleLoginSubmit = e => {
   loginUser(loginData.email, loginData.password, location, history);
     e.preventDefault();
   }
+
+//*******************handle google sign in********************
+const handleGoogleSignIn = () => {
+  signInWithGoogle (location, history);
+}
+
   return (
     <Container>
       <Grid container spacing={2}>
@@ -34,16 +43,25 @@ const history = useHistory();
           <form onSubmit={handleLoginSubmit}>
             <TextField id="standard-basic"
               sx={{ width: '80%', m: 1 }}
+              label="Your Name"
+              name="name"
+              type="text"
+              onBlur={handleOnBlur}
+              variant="standard" />
+
+            <TextField id="standard-basic"
+              sx={{ width: '80%', m: 1 }}
               label="Your Email"
               name="email"
-              onChange={handleOnChange}
+              type="email"
+              onBlur={handleOnBlur}
               variant="standard" />
 
             <TextField id="standard-basic"
               sx={{ width: '80%', m: 1 }}
               type="password"
               name="password"
-              onChange={handleOnChange}
+              onBlur={handleOnBlur}
               label="Your password"
               variant="standard" />
 
@@ -62,7 +80,8 @@ const history = useHistory();
             authError && <Alert severity="error">{authError}</Alert>
           }
           </form>
-
+          <p>***************************************************</p>
+          <Button onBlur={handleGoogleSignIn} variant="contained">Google Sign In</Button>
 
         </Grid>
         <Grid item xs={12} md={6}>
