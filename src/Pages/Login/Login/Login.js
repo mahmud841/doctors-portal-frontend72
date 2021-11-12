@@ -41,13 +41,13 @@ const handleGoogleSignIn = () => {
         <Grid item sx={{ mt: 9 }} xs={12} md={6}>
           <Typography variant="body1" gutterBottom>  Login </Typography>
           <form onSubmit={handleLoginSubmit}>
-            <TextField id="standard-basic"
+            {/* <TextField id="standard-basic"
               sx={{ width: '80%', m: 1 }}
               label="Your Name"
               name="name"
               type="text"
               onBlur={handleOnBlur}
-              variant="standard" />
+              variant="standard" /> */}
 
             <TextField id="standard-basic"
               sx={{ width: '80%', m: 1 }}

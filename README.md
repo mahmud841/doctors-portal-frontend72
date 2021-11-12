@@ -6,4 +6,4 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
-* 06/11/2021 practice doctor-portal appointment part 
+* 07/11/2021 practice doctor-portal appointment part 

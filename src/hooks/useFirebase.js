@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import initializeFirebase from "../Pages/Login/Firebase/firebase.init";
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, signOut, onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile, signOut, onAuthStateChanged, signInWithEmailAndPassword, getIdToken } from "firebase/auth";
 
 
 //initialize firebase app here 
@@ -10,6 +10,8 @@ const useFirebase = () => {
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState('');
+  const [admin, setAdmin] = useState(false);
+  const [token, setToken] = useState('');
 
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider();
@@ -24,6 +26,8 @@ const useFirebase = () => {
         const newUser = { email, displayName: name };
         setUser(newUser);
 
+        // save user to the database 
+        saveUser(email, name, 'POST');
         // send name to firebase after creation 
         updateProfile(auth.currentUser, {
           displayName: name,
@@ -68,7 +72,11 @@ const useFirebase = () => {
     signInWithPopup(auth, googleProvider)
       .then((result) => {
         const user = result.user;
+        saveUser(user.email, user.displayName, 'PUT');
         setAuthError('');
+
+        const destination = location?.state?.from || '/';
+        history.replace(destination);
 
       }).catch((error) => {
         setAuthError(error.message);
@@ -77,7 +85,7 @@ const useFirebase = () => {
   }
 
 
-  // observer user state function 
+  //***********observer user state function**************** 
   /* avabe o kora jai 
   onAuthStateChanged function using 
   useEffect(() =>{
@@ -94,6 +102,13 @@ const useFirebase = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        // *********GET JWT TOKEN*************
+        getIdToken(user)
+        .then(idToken => {
+          // console.log(idToken);
+          setToken(idToken);
+          
+        })
       } else {
         setUser({});
       }
@@ -102,8 +117,13 @@ const useFirebase = () => {
     return () => unsubscribe;
   }, [])
 
+//**************Data load for admin  */
 
-
+useEffect(() => {
+  fetch(`http://localhost:5000/users/${user.email}`)
+  .then(res => res.json())
+  .then(data => setAdmin(data.admin))
+},[user.email])
 
   const logOut = () => {
     // logout button a click korle true hobe 
@@ -117,8 +137,24 @@ const useFirebase = () => {
     ;
   }
 
+//************ */
+const saveUser = (email, displayName, method) => {
+  const user = {email, displayName};
+  fetch('http://localhost:5000/users',{
+    method: method,
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(user)
+  })
+  .then()
+
+}
+
   return {
     user,
+    admin,
+    token,
     isLoading,
     authError,
     registerUser,
